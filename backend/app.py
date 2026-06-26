@@ -3,11 +3,14 @@ import time
 from flask import Flask
 from flask_restful import Resource, Api, request
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 
 from extensions import db
 from models import User
 
 app = Flask(__name__)
+
+CORS(app)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
 api = Api(app)
@@ -68,7 +71,8 @@ class TodoResource(Resource):
     def get(self):
         return {"msg":"todo app"}
 
-
+from controllers import register_api
+register_api(api)
 
 api.add_resource(UserResource, '/user', '/user/<int:id>')
 api.add_resource(TodoResource, '/todo')
