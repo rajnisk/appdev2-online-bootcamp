@@ -1,5 +1,5 @@
 <template>
-  <h1>home page</h1>
+  <h1>{{ add}}</h1>
   <router-link to="/about">go to about page</router-link>
   <br>
   <p>{{ name }}</p>
@@ -28,8 +28,9 @@
 
   <div class="card" v-for="student in data">
     <div class="card-body">
-      <p>name: {{ student.name }}</p>
-      <p>age: {{ student.age }}</p>
+      <p>name: {{ student.id }}</p>
+      <p>age: {{ student.username }}</p>
+      <p>age: {{ student.email }}</p>
     </div>
   </div>
 
@@ -44,22 +45,26 @@
 
 </template>
 
+
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
       name: "shivam",
       age: "21",
       num: 5,
-      data: [
-        { name: "shivam", age: 20 },
-        { name: "sachin", age: 21 },
-        { name: "saurabh", age: 22 },
-        { name: "satyam", age: 23 },
-      ]
+      data: []
     }
   },
   methods: {
+
+  async fetch_users(){
+    const response = await axios.get('http://127.0.0.1:5000/user')
+    console.log(response)
+    this.data = response.data.msg
+  },
     add_nums() {
       const a = "app dev "
       const b = "project"
@@ -72,13 +77,18 @@ export default {
     }
   },
   computed: {
-
+    add() {
+      return 'shivam'
+    }
   },
+
   created() {
-    alert(this.age)
+    alert(this.add_nums())
+    // alert(this.age)
   },
   mounted() {
-    this.add_nums()
+    // this.add_nums()
+    this.fetch_users()
   }
 }
 
