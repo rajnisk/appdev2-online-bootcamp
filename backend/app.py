@@ -1,19 +1,22 @@
+from datetime import datetime
+import time
 from flask import Flask
 from flask_restful import Resource, Api, request
 from flask_sqlalchemy import SQLAlchemy
 
-from extensions import db, api
+from extensions import db
 from models import User
 
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
-
+api = Api(app)
 db.init_app(app)
-api.init_app(app)
+# api.init_app(app)
 
 with app.app_context():
-    db.drop_all()
+    # db.drop_all()
+    time.sleep(5)
     db.create_all()
 
 # @app.route('/')
@@ -26,10 +29,19 @@ with app.app_context():
 
 
 # =================== flask restful =================
-class HelloWorld(Resource):
-    def get(self):
-        return {'msg': 'get'}
-    
+class UserResource(Resource):
+    def get(self, id=None):
+        if id is None:
+            users = User.query.all()
+            data = []
+            for user in users:
+                # data.append({'id': user.id, 'username':user.username, 'email':user.email})
+                data.append(user.to_json())
+
+            return {'msg': data}
+        else:
+            return {'msg': f'get user with id {id}'}
+
     def post(self):
         data = request.get_json()
         new_user = User(username=data.get('username'), email=data.get('email'))
@@ -50,8 +62,16 @@ class HelloWorld(Resource):
         db.session.delete(user)
         db.session.commit()
         return {'msg': 'user with id {id} deleted!'}
+    
 
-api.add_resource(HelloWorld, '/', '/<int:id>')
+class TodoResource(Resource):
+    def get(self):
+        return {"msg":"todo app"}
+
+
+
+api.add_resource(UserResource, '/user', '/user/<int:id>')
+api.add_resource(TodoResource, '/todo')
 
 if __name__ == '__main__':
     app.run(debug=True)
